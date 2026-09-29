@@ -254,6 +254,8 @@ label.fld{display:block;font-family:var(--mono);font-size:11px;color:var(--cyan)
 .galcard .votebtn2{border:0;border-top:1px solid var(--line);background:var(--glass2);color:var(--ink);padding:9px;font-family:var(--ui);font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
 .galcard .votebtn2:hover{background:rgba(62,240,168,.22)}
 .galcard .votebtn2.voted{background:linear-gradient(135deg,rgba(62,240,168,.32),rgba(47,240,255,.2));color:#fff}
+.tcard-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.5);color:var(--mut);font-size:12px;cursor:pointer;line-height:1;z-index:3;transition:.15s;display:grid;place-items:center}
+.tcard-x:hover{color:#fff;border-color:var(--magenta);background:rgba(255,45,155,.28)}
 @media (max-width:760px){.brow{grid-template-columns:40px 46px 1fr auto;gap:10px;padding:12px}.nav{width:100%;justify-content:flex-start}.hudinfo{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}.bg-grid,.hero-title,.champ{animation:none}}
 
@@ -443,7 +445,7 @@ function makeLocalDB(){
 }
 
 /* ---------------- State ---------------- */
-function defaultGame(){return {phase:"lobby",round:1,r1:{items:[],idx:0},r2:{mid:null,note:"",revealed:false},r3:{brief:R3_BRIEF},timer:{endsAt:0,total:0,running:false}};}
+function defaultGame(){return {phase:"lobby",started:false,round:1,r1:{items:[],idx:0},r2:{mid:null,note:"",revealed:false},r3:{brief:R3_BRIEF},timer:{endsAt:0,total:0,running:false}};}
 var DB=null, USER=null, online=false, dbReady=false;
 var ISOWNER=false, ISADMIN=false, CANWRITE=true, myId=null, role="team", forcedRole=null;
 var game=defaultGame(), teams=[], scores={}, media={}, answers={};
@@ -658,7 +660,7 @@ function connStatus(){return online?'<div class="banner info">✔ Base de datos 
 function connWarn(){return online?"":connWarnMsg();}
 function hostLobby(){
   var link=location.origin+location.pathname;
-  var cards=teams.length?teams.map(function(t){return '<div class="glass tcard">'+avatarHTML(t,"avatar")+'<div class="nm">'+esc(t.name)+'</div></div>';}).join(""):'<div class="empty">// ESPERANDO QUE LOS EQUIPOS SE CONECTEN…</div>';
+  var cards=teams.length?teams.map(function(t){return '<div class="glass tcard"><button class="tcard-x" data-action="delTeam" data-id="'+t.id+'" title="Eliminar equipo">✕</button>'+avatarHTML(t,"avatar")+'<div class="nm">'+esc(t.name)+'</div></div>';}).join(""):'<div class="empty">// ESPERANDO QUE LOS EQUIPOS SE CONECTEN…</div>';
   return '<div class="stage">'+connStatus()+
     '<div class="round-head"><div class="pill hot">SALA DE ESPERA</div><h2>Conecta a los equipos</h2><p>Comparte este link. Cada equipo entra desde su computador, pone su nombre y su foto, y aparece aquí en vivo.</p></div>'+
     '<div class="linkbox"><input class="input" id="joinlink" readonly value="'+esc(link)+'"><button class="btn btn-cyan" data-action="copyLink">Copiar link</button>'+'<button class="btn btn-ghost" data-action="addLocalTeam">+ Agregar equipo</button>'+'</div>'+
@@ -727,8 +729,10 @@ function hostPodium(){
 function teamRender(){
   if(!CANWRITE){return '<div class="stage"><div class="center"><div class="pill hot">FALTA UN PERMISO</div><h2 class="round-head" style="font-family:var(--disp);font-size:clamp(26px,5vw,44px)">Pídele acceso al anfitrión</h2><p class="hero-sub">Este link está compartido en modo solo lectura. El anfitrión debe compartirlo con permiso de <b>edición</b> (o abrir el acceso a la organización) para que puedas registrar tu equipo.</p></div></div>';}
   if(!myTeam())return teamRegister();
-  var p=game.phase, mt=myTeam();
-  if(p==="lobby")return teamWait("¡Estás dentro, "+mt.name+"! 🎉","Mira la pantalla principal. El torneo está por comenzar.");
+  var mt=myTeam();
+  if(!game.started)return teamWait("¡Bienvenido, "+mt.name+"! 🎉","En unos minutos el administrador dará inicio a la actividad. Mira la pantalla principal. 👀");
+  var p=game.phase;
+  if(p==="lobby")return teamWait("¡Listo, "+mt.name+"!","El anfitrión está preparando la siguiente actividad…");
   if(p==="r1")return teamR1();
   if(p==="r2")return teamR2();
   if(p==="r3")return teamR3();
@@ -812,8 +816,9 @@ var actions={
   adminLogout:function(){isAdmin=false;role="team";try{localStorage.removeItem("torneoIA_admin");}catch(e){}entryChoice=null;render();},
   adminMode:function(el){adminMode=el.dataset.m;try{localStorage.setItem("torneoIA_adminMode",adminMode);}catch(e){}render();},
   copyLink:function(){var i=document.getElementById("joinlink");if(i){try{navigator.clipboard.writeText(i.value);flash("Link copiado ✔");}catch(e){i.select();flash("Selecciona y copia el link");}}},
-  hostGo:function(el){hostView=el.dataset.v;if(hostView.charAt(0)==="r"&&hostView.length===2){game.phase=hostView;game.round=parseInt(hostView.charAt(1),10);saveGame();}else if(hostView==="board"){game.phase="board";saveGame();var ld=sortedTeams()[0];if(ld)narr("Así va el tablero. En primer lugar, "+ld.name+", con "+scoreOf(ld.id)+" puntos.");}else if(hostView==="podium"){game.phase="podium";saveGame();setTimeout(confettiBurst,900);setTimeout(sfxFanfare,700);var wn=sortedTeams()[0];if(wn)setTimeout(function(){narr("¡Tenemos ganador! El primer lugar es para "+wn.name+", con "+scoreOf(wn.id)+" puntos. ¡Felicitaciones a todos!");},1200);}else if(hostView==="lobby"){game.phase="lobby";saveGame();}render();},
-  startR1:function(){ac();hostView="r1";game.phase="r1";game.round=1;saveGame();render();actions.say({dataset:{r:"1"}});},
+  delTeam:function(el){var id=el.dataset.id;var t=teams.find(function(x){return x.id===id;});var nm=t?t.name:"este equipo";if(!confirm("¿Eliminar a "+nm+"? Se borra su registro, respuestas y puntaje."))return;if(DB)DB.doc("teams/"+id).delete().catch(function(){});var suf="_"+id;Object.keys(answers).forEach(function(k){if(k.slice(-suf.length)===suf){if(DB)DB.doc("answers/"+k).delete().catch(function(){});delete answers[k];}});if(scores[id]!=null){delete scores[id];saveScores();}sfxDown();render();},
+  hostGo:function(el){hostView=el.dataset.v;game.started=(el.dataset.v!=="lobby");if(hostView.charAt(0)==="r"&&hostView.length===2){game.phase=hostView;game.round=parseInt(hostView.charAt(1),10);saveGame();}else if(hostView==="board"){game.phase="board";saveGame();var ld=sortedTeams()[0];if(ld)narr("Así va el tablero. En primer lugar, "+ld.name+", con "+scoreOf(ld.id)+" puntos.");}else if(hostView==="podium"){game.phase="podium";saveGame();setTimeout(confettiBurst,900);setTimeout(sfxFanfare,700);var wn=sortedTeams()[0];if(wn)setTimeout(function(){narr("¡Tenemos ganador! El primer lugar es para "+wn.name+", con "+scoreOf(wn.id)+" puntos. ¡Felicitaciones a todos!");},1200);}else if(hostView==="lobby"){game.phase="lobby";saveGame();}render();},
+  startR1:function(){ac();hostView="r1";game.phase="r1";game.round=1;game.started=true;saveGame();render();actions.say({dataset:{r:"1"}});},
   reset:function(){if(confirm("¿Reiniciar el torneo? Se borran equipos y puntajes para todos.")){game=defaultGame();scores={};teams.slice().forEach(function(t){if(DB)DB.doc("teams/"+t.id).delete().catch(function(){});});Object.keys(answers).forEach(function(k){if(DB)DB.doc("answers/"+k).delete().catch(function(){});});Object.keys(media).forEach(function(k){if(DB)DB.doc("media/"+k).delete().catch(function(){});});saveGame();saveScores();hostView="lobby";render();}},
 
   say:function(el){var r=el.dataset.r;var t=timerLeft();var mins=game.timer&&game.timer.total?Math.round(game.timer.total/60):0;var txt;
