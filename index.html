@@ -256,6 +256,13 @@ label.fld{display:block;font-family:var(--mono);font-size:11px;color:var(--cyan)
 .galcard .votebtn2.voted{background:linear-gradient(135deg,rgba(62,240,168,.32),rgba(47,240,255,.2));color:#fff}
 .tcard-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.5);color:var(--mut);font-size:12px;cursor:pointer;line-height:1;z-index:3;transition:.15s;display:grid;place-items:center}
 .tcard-x:hover{color:#fff;border-color:var(--magenta);background:rgba(255,45,155,.28)}
+.allocrow{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px;border-top:1px solid var(--line)}
+.abtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--glass2);color:var(--ink);font-size:18px;font-weight:700;cursor:pointer;line-height:1;transition:.15s}
+.abtn.plus:hover{border-color:var(--green);background:rgba(62,240,168,.2)}
+.abtn:hover{border-color:var(--cyan)}
+.abtn[disabled]{opacity:.35;cursor:not-allowed}
+.apts{font-family:var(--disp);font-weight:800;font-size:20px;min-width:2ch;text-align:center;color:var(--gold)}
+.noimg2{position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-size:12px}
 @media (max-width:760px){.brow{grid-template-columns:40px 46px 1fr auto;gap:10px;padding:12px}.nav{width:100%;justify-content:flex-start}.hudinfo{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}.bg-grid,.hero-title,.champ{animation:none}}
 
@@ -445,7 +452,7 @@ function makeLocalDB(){
 }
 
 /* ---------------- State ---------------- */
-function defaultGame(){return {phase:"lobby",started:false,round:1,r1:{items:[],idx:0},r2:{mid:null,note:"",revealed:false},r3:{brief:R3_BRIEF},timer:{endsAt:0,total:0,running:false}};}
+function defaultGame(){return {phase:"lobby",started:false,round:1,r1:{items:[],idx:0},r2:{mid:null,note:"",revealed:false,voting:false,applied:false},r3:{brief:R3_BRIEF,voting:false,applied:false},timer:{endsAt:0,total:0,running:false}};}
 var DB=null, USER=null, online=false, dbReady=false;
 var ISOWNER=false, ISADMIN=false, CANWRITE=true, myId=null, role="team", forcedRole=null;
 var game=defaultGame(), teams=[], scores={}, media={}, answers={};
@@ -565,14 +572,29 @@ function leaderboard(){
 
 /* ================= HOST ================= */
 function r2img(id){var a=answers["g_"+id];return a&&a.img?a.img:null;}
-function r2votesFor(id){var n=0;for(var k in answers){var a=answers[k];if(a&&a.kind==="r2vote"&&a.choice===id)n++;}return n;}
-function myR2vote(){var a=answers["rv_"+myId];return a?a.choice:null;}
+function r2alloc(v){var a=answers["rv_"+v];return (a&&a.alloc)||{};}
+function r2Received(id){var n=0;for(var k in answers){var a=answers[k];if(a&&a.kind==="r2vote"&&a.alloc)n+=(a.alloc[id]||0);}return n;}
+function myR2alloc(){return r2alloc(myId);}
+function r2Spent(v){var al=r2alloc(v),n=0;for(var k in al)n+=al[k];return n;}
 function refRow(){return '<div class="refrow">'+R2_REFS.map(function(r,i){var m=media[r.id];var lbl=i===0?"MELÓN \ud83c\udf48":"FRESA \ud83c\udf53";return '<div class="refbox"><span class="rl">REFERENCIA · '+lbl+'</span><div class="refimg">'+(m?'<img src="'+m+'" alt="">':'')+'</div></div>';}).join("")+'</div>';}
 function r3img(id){var a=answers["c_"+id];return a&&a.img?a.img:null;}
 function r3eslogan(id){var a=answers["c_"+id];return a&&a.text?a.text:"";}
 function r3tries(id){var a=answers["c_"+id];return (a&&a.tries)||0;}
-function r3votesFor(id){var n=0;for(var k in answers){var a=answers[k];if(a&&a.kind==="r3vote"&&a.choice===id)n++;}return n;}
-function myR3vote(){var a=answers["rv3_"+myId];return a?a.choice:null;}
+function r3alloc(v){var a=answers["rv3_"+v];return (a&&a.alloc)||{};}
+function r3Received(id){var n=0;for(var k in answers){var a=answers[k];if(a&&a.kind==="r3vote"&&a.alloc)n+=(a.alloc[id]||0);}return n;}
+function myR3alloc(){return r3alloc(myId);}
+function r3Spent(v){var al=r3alloc(v),n=0;for(var k in al)n+=al[k];return n;}
+function allocChange(which,tid,d){
+  var budget=which==="r2"?6:8;var key=(which==="r2"?"rv_":"rv3_")+myId;
+  var cur=(answers[key]&&answers[key].alloc)||{};var a={};for(var k in cur)a[k]=cur[k];
+  var others=0;for(var k in a){if(k!==tid)others+=a[k];}
+  var nv=(a[tid]||0)+d;if(nv<0)nv=0;
+  if(tid===myId&&nv>2){nv=2;flash("Máximo 2 puntos para tu propio equipo");}
+  if(others+nv>budget){flash("Máximo "+budget+" puntos en total");return;}
+  if(nv===0)delete a[tid];else a[tid]=nv;
+  if(DB)DB.doc("answers/"+key).set({kind:(which==="r2"?"r2vote":"r3vote"),teamId:myId,alloc:a}).catch(handleWErr);
+  sfxUp();render();
+}
 function miniBoard(){
   if(!teams.length)return '<div class="score-wrap" style="max-width:520px"><div class="score-title">🎮 GAMIFICADOR</div><div class="empty" style="padding:14px">// esperando equipos…</div></div>';
   var s=sortedTeams().slice(0,6),max=Math.max(1,scoreOf(s[0].id)),med=["🥇","🥈","🥉"];
@@ -614,17 +636,21 @@ function liveR1(){
 }
 function liveR2(){
   var got=ansList("prompt").length;
+  if(game.r2.voting){
+    var grid=teams.map(function(t){var im=r2img(t.id);return '<div class="galcard"><div class="galimg">'+(im?'<img src="'+im+'" alt="">':'<div class="noimg2">sin imagen</div>')+'</div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r2Received(t.id)+' ★</span></div></div>';}).join("");
+    return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 2 · ¡ES HORA DE VOTAR!</div></div>'+liveTimerBig()+'<div class="galgrid">'+grid+'</div></div><div class="live-side">'+miniBoard()+'</div></div>';
+  }
   var withImgs=teams.filter(function(t){return r2img(t.id);});
-  var gal;
-  if(withImgs.length){gal='<div class="galgrid">'+teams.map(function(t){var im=r2img(t.id);if(!im)return "";return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r2votesFor(t.id)+' ★</span></div></div>';}).join("")+'</div>';}
-  else{gal='<div class="tag wait" style="font-size:18px">✍️ '+got+' / '+teams.length+' enviaron su prompt</div>';}
+  var gal=withImgs.length?'<div class="galgrid">'+teams.map(function(t){var im=r2img(t.id);if(!im)return "";return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span></div></div>';}).join("")+'</div>':'<div class="tag wait" style="font-size:18px">✍️ '+got+' / '+teams.length+' enviaron su prompt</div>';
   return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 2 · REPRODUCE LA IMAGEN</div></div>'+liveTimerBig()+refRow()+gal+'</div><div class="live-side">'+miniBoard()+'</div></div>';
 }
 function liveR3(){
   var withImgs=teams.filter(function(t){return r3img(t.id);});var got=withImgs.length;
-  var gal;
-  if(got){gal='<div class="galgrid">'+teams.map(function(t){var im=r3img(t.id);if(!im)return "";return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r3votesFor(t.id)+' ★</span></div>'+(r3eslogan(t.id)?'<div style="padding:0 10px 8px;font-size:12px;color:var(--mut)">“'+esc(r3eslogan(t.id))+'”</div>':'')+'</div>';}).join("")+'</div>';}
-  else{gal='<div class="tag wait" style="font-size:18px">🎨 '+got+' / '+teams.length+' subieron su anuncio</div>';}
+  if(game.r3.voting){
+    var grid=teams.map(function(t){var im=r3img(t.id);return '<div class="galcard"><div class="galimg">'+(im?'<img src="'+im+'" alt="">':'<div class="noimg2">sin imagen</div>')+'</div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r3Received(t.id)+' ★</span></div>'+(r3eslogan(t.id)?'<div style="padding:0 10px 8px;font-size:12px;color:var(--mut)">“'+esc(r3eslogan(t.id))+'”</div>':'')+'</div>';}).join("");
+    return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 3 · ¡ES HORA DE VOTAR!</div></div>'+liveTimerBig()+'<div class="galgrid">'+grid+'</div></div><div class="live-side">'+miniBoard()+'</div></div>';
+  }
+  var gal=got?'<div class="galgrid">'+teams.map(function(t){var im=r3img(t.id);if(!im)return "";return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span></div>'+(r3eslogan(t.id)?'<div style="padding:0 10px 8px;font-size:12px;color:var(--mut)">“'+esc(r3eslogan(t.id))+'”</div>':'')+'</div>';}).join("")+'</div>':'<div class="tag wait" style="font-size:18px">🎨 '+got+' / '+teams.length+' subieron su anuncio</div>';
   return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 3 · CREA EL ANUNCIO</div></div>'+liveTimerBig()+'<div class="glass brief" style="max-width:560px"><span class="lbl">EL RETO</span>'+esc(game.r3.brief)+'</div>'+gal+'</div><div class="live-side">'+miniBoard()+'</div></div>';
 }
 function liveBoard(){return '<div class="center"><div class="pill hot">TABLERO EN VIVO</div><h1 class="hero-title" style="font-size:clamp(36px,7vw,82px)">🎮 Gamificador</h1>'+leaderboard()+'</div>';}
@@ -699,22 +725,25 @@ function hostR1(){
   return '<div class="stage">'+connWarn()+head+goBar(1)+main+miniBoard()+showbar()+hostFoot(1)+'</div>';
 }
 function hostR2(){
-  var panel='<div class="score-wrap"><div class="score-title">EQUIPOS · prompt, imagen generada y puntos</div>'+teams.map(function(t){
-    var a=answers["p_"+t.id];var txt=a&&a.text?a.text:"— sin prompt —";
-    var im=r2img(t.id);
+  var panel='<div class="score-wrap"><div class="score-title">EQUIPOS · prompt, imagen y votos</div>'+teams.map(function(t){
+    var a=answers["p_"+t.id];var txt=a&&a.text?a.text:"— sin prompt —";var im=r2img(t.id);
     var thumb=im?'<img src="'+im+'" alt="" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex:0 0 auto">':'<div style="width:52px;height:52px;border-radius:8px;background:var(--glass2);display:grid;place-items:center;font-size:10px;color:var(--faint);flex:0 0 auto">sin img</div>';
-    return '<div class="srow">'+avatarHTML(t,"av")+thumb+'<div style="min-width:0;flex:1"><div class="snm">'+esc(t.name)+' <span class="votes" style="color:var(--gold);font-family:var(--mono);font-size:12px">'+r2votesFor(t.id)+' ★</span></div><div class="sub" style="white-space:normal">'+esc(txt)+'</div></div><label class="pbtn" style="cursor:pointer">📤 Imagen<input type="file" accept="image/*" data-file="r2img" data-team="'+t.id+'" style="display:none"></label><div class="sc">'+scoreOf(t.id)+'</div><div class="pbtns"><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="3">+3</button><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="1">+1</button><button class="pbtn minus" data-action="award" data-id="'+t.id+'" data-d="-1">−</button></div></div>';
+    return '<div class="srow">'+avatarHTML(t,"av")+thumb+'<div style="min-width:0;flex:1"><div class="snm">'+esc(t.name)+' <span class="votes" style="color:var(--gold);font-family:var(--mono);font-size:12px">'+r2Received(t.id)+' ★ votos</span></div><div class="sub" style="white-space:normal">'+esc(txt)+'</div></div><label class="pbtn" style="cursor:pointer">📤<input type="file" accept="image/*" data-file="r2img" data-team="'+t.id+'" style="display:none"></label><div class="sc">'+scoreOf(t.id)+'</div><div class="pbtns"><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="2">+2</button><button class="pbtn minus" data-action="award" data-id="'+t.id+'" data-d="-2">−2</button></div></div>';
   }).join("")+'</div>';
-  var head='<div class="round-head"><div class="pill hot">RETO 2</div><h2>Reproduce la imagen</h2><p>Los equipos escriben su prompt para recrear el melón y la fresa. Tú corres cada prompt, subes la imagen de cada equipo con 📤, y al final se vota en la galería.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button class="btn btn-cyan" data-action="say" data-r="2">🎙️ Presentar reto (voz)</button></div></div>';
+  var vbtn=game.r2.voting?'<button class="btn btn-primary" data-action="r2ToggleVote">⬛ Cerrar votación</button>':'<button class="btn btn-cyan" data-action="r2ToggleVote">🗳️ Abrir votación</button>';
+  var abtn='<button class="btn btn-ghost" data-action="r2Apply"'+(game.r2.applied?" disabled":"")+'>'+(game.r2.applied?"✔ Votos aplicados":"➕ Aplicar votos → puntos")+'</button>';
+  var head='<div class="round-head"><div class="pill hot">RETO 2</div><h2>Reproduce la imagen</h2><p>Los equipos escriben su prompt; tú subes su imagen con 📤. Luego <b>abre la votación</b> (6 pts c/u) y al final <b>aplica los votos</b> como puntos.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button class="btn btn-cyan" data-action="say" data-r="2">🎙️ Presentar reto</button>'+vbtn+abtn+'</div></div>';
   return '<div class="stage">'+connWarn()+head+goBar(2)+'<div class="qwrap">'+refRow()+panel+'</div>'+miniBoard()+showbar()+hostFoot(2)+'</div>';
 }
 function hostR3(){
-  var panel='<div class="score-wrap"><div class="score-title">EQUIPOS · anuncio, eslogan y puntos</div>'+teams.map(function(t){
+  var panel='<div class="score-wrap"><div class="score-title">EQUIPOS · anuncio, eslogan y votos</div>'+teams.map(function(t){
     var im=r3img(t.id);var esl=r3eslogan(t.id);var tries=r3tries(t.id);
     var thumb=im?'<img src="'+im+'" alt="" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex:0 0 auto">':'<div style="width:52px;height:52px;border-radius:8px;background:var(--glass2);display:grid;place-items:center;font-size:10px;color:var(--faint);flex:0 0 auto">sin img</div>';
-    return '<div class="srow">'+avatarHTML(t,"av")+thumb+'<div style="min-width:0;flex:1"><div class="snm">'+esc(t.name)+' <span class="votes" style="color:var(--gold);font-family:var(--mono);font-size:12px">'+r3votesFor(t.id)+' ★</span> <span class="kbd">'+tries+'/3</span></div><div class="sub" style="white-space:normal">'+(esl?'“'+esc(esl)+'”':'— sin eslogan —')+'</div></div><label class="pbtn" style="cursor:pointer">📤<input type="file" accept="image/*" data-file="r3img" data-team="'+t.id+'" style="display:none"></label><div class="sc">'+scoreOf(t.id)+'</div><div class="pbtns"><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="5">+5</button><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="3">+3</button><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="1">+1</button><button class="pbtn minus" data-action="award" data-id="'+t.id+'" data-d="-1">−</button></div></div>';
+    return '<div class="srow">'+avatarHTML(t,"av")+thumb+'<div style="min-width:0;flex:1"><div class="snm">'+esc(t.name)+' <span class="votes" style="color:var(--gold);font-family:var(--mono);font-size:12px">'+r3Received(t.id)+' ★ votos</span> <span class="kbd">'+tries+'/3</span></div><div class="sub" style="white-space:normal">'+(esl?'“'+esc(esl)+'”':'— sin eslogan —')+'</div></div><label class="pbtn" style="cursor:pointer">📤<input type="file" accept="image/*" data-file="r3img" data-team="'+t.id+'" style="display:none"></label><div class="sc">'+scoreOf(t.id)+'</div><div class="pbtns"><button class="pbtn plus" data-action="award" data-id="'+t.id+'" data-d="2">+2</button><button class="pbtn minus" data-action="award" data-id="'+t.id+'" data-d="-2">−2</button></div></div>';
   }).join("")+'</div>';
-  var head='<div class="round-head"><div class="pill hot">RETO 3</div><h2>Crea el anuncio</h2><p>Cada equipo piensa su idea, genera su anuncio (3 intentos) y sube su imagen final. Luego se vota en la galería y asignas los puntos.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button class="btn btn-cyan" data-action="say" data-r="3">🎙️ Presentar reto (voz)</button><button class="btn btn-ghost" data-action="loadR3Brief">📋 Cargar brief de ejemplo</button><button class="btn btn-ghost" data-action="briefEdit">✎ Editar brief</button></div></div>';
+  var vbtn=game.r3.voting?'<button class="btn btn-primary" data-action="r3ToggleVote">⬛ Cerrar votación</button>':'<button class="btn btn-cyan" data-action="r3ToggleVote">🗳️ Abrir votación</button>';
+  var abtn='<button class="btn btn-ghost" data-action="r3Apply"'+(game.r3.applied?" disabled":"")+'>'+(game.r3.applied?"✔ Votos aplicados":"➕ Aplicar votos → puntos")+'</button>';
+  var head='<div class="round-head"><div class="pill hot">RETO 3</div><h2>Crea el anuncio</h2><p>Cada equipo sube su anuncio (3 intentos) y su eslogan. Luego <b>abre la votación</b> (8 pts c/u) y al final <b>aplica los votos</b>.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button class="btn btn-cyan" data-action="say" data-r="3">🎙️ Presentar reto</button>'+vbtn+abtn+'<button class="btn btn-ghost" data-action="loadR3Brief">📋 Brief</button></div></div>';
   return '<div class="stage">'+connWarn()+head+goBar(3)+'<div class="qwrap"><div class="glass brief"><span class="lbl">EL RETO</span>'+esc(game.r3.brief)+'</div>'+panel+'</div>'+miniBoard()+showbar()+hostFoot(3)+'</div>';
 }
 function hostFoot(r){return '<div class="qnav" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:4px">'+(r>1?'<button class="btn btn-ghost" data-action="hostGo" data-v="r'+(r-1)+'">◂ Reto '+(r-1)+'</button>':'')+'<button class="btn btn-cyan" data-action="hostGo" data-v="board">Ver tablero</button>'+(r<3?'<button class="btn btn-primary" data-action="hostGo" data-v="r'+(r+1)+'">Reto '+(r+1)+' ▸</button>':'<button class="btn btn-primary" data-action="hostGo" data-v="podium">Podio 🏆</button>')+'</div>';}
@@ -762,22 +791,24 @@ function teamR1(){
 }
 function teamR2(){
   var a=answers["p_"+myId];var mine=r2img(myId);
-  var withImgs=teams.filter(function(t){return r2img(t.id);});
-  var gal="";
-  if(withImgs.length){var mv=myR2vote();
-    gal='<div class="score-title" style="margin-top:10px">GALERÍA — vota la que más se parezca</div><div class="galgrid">'+teams.map(function(t){var im=r2img(t.id);if(!im)return "";var voted=mv===t.id;var canVote=t.id!==myId;return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r2votesFor(t.id)+' ★</span></div>'+(canVote?'<button class="votebtn2'+(voted?" voted":"")+'" data-action="r2vote" data-id="'+t.id+'">'+(voted?"✔ Tu voto":"Votar")+'</button>':'<div class="votebtn2" style="opacity:.5;cursor:default">Tu equipo</div>')+'</div>';}).join("")+'</div>';}
-  return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 2</div><h2>Reproduce la imagen</h2><p>Escribe un prompt para recrear estas imágenes. ¡La más parecida gana!</p></div>'+timerChip()+'<div class="qwrap">'+refRow()+'<div class="kbd">🔍 Toca una imagen para ampliarla</div><textarea class="input" id="promptIn" style="max-width:560px;min-height:100px" placeholder="Describe la imagen con detalle: fruta, luz, gotas, fondo, estilo...">'+esc(a&&a.text?a.text:"")+'</textarea><button class="btn btn-primary btn-lg" data-action="sendPrompt">Enviar prompt ▸</button>'+(a?'<div class="tag ok">Prompt enviado ✔ — puedes actualizarlo</div>':'')+(mine?'<div class="refbox" style="margin-top:8px"><span class="rl">TU RESULTADO</span><div class="refimg"><img src="'+mine+'" alt=""></div></div>':'')+gal+'</div></div>';
+  if(game.r2.voting){
+    var alloc=myR2alloc();var left=6-r2Spent(myId);
+    var grid=teams.map(function(t){var im=r2img(t.id);var mp=alloc[t.id]||0;var me=t.id===myId;var pd=((me&&mp>=2)||left<=0)?" disabled":"";return '<div class="galcard"><div class="galimg">'+(im?'<img src="'+im+'" alt="">':'<div class="noimg2">sin imagen</div>')+'</div><div class="gnm"><span>'+esc(t.name)+(me?" (tú)":"")+'</span><span class="votes">'+r2Received(t.id)+' ★</span></div><div class="allocrow"><button class="abtn" data-action="r2Alloc" data-id="'+t.id+'" data-d="-2"'+(mp<=0?" disabled":"")+'>−</button><span class="apts">'+mp+'</span><button class="abtn plus" data-action="r2Alloc" data-id="'+t.id+'" data-d="2"'+pd+'>+2</button></div></div>';}).join("");
+    return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 2 · ¡A VOTAR!</div><h2>Reparte tus 6 puntos</h2><p>Da <b>+2</b> a los mejores. Máx 2 a tu propio equipo. Te quedan <b>'+left+'</b>.</p></div>'+timerChip()+'<div class="qwrap"><div class="galgrid">'+grid+'</div></div></div>';
+  }
+  return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 2</div><h2>Reproduce la imagen</h2><p>Escribe un prompt para recrear estas imágenes. El anfitrión subirá tu resultado.</p></div>'+timerChip()+'<div class="qwrap">'+refRow()+'<div class="kbd">🔍 Toca una imagen para ampliarla</div><textarea class="input" id="promptIn" style="max-width:560px;min-height:100px" placeholder="Describe la imagen con detalle: fruta, luz, gotas, fondo, estilo...">'+esc(a&&a.text?a.text:"")+'</textarea><button class="btn btn-primary btn-lg" data-action="sendPrompt">Enviar prompt ▸</button>'+(a?'<div class="tag ok">Prompt enviado ✔</div>':'')+(mine?'<div class="refbox" style="margin-top:8px"><span class="rl">TU RESULTADO</span><div class="refimg"><img src="'+mine+'" alt=""></div></div>':'')+'<div class="kbd" style="margin-top:6px">Cuando el anfitrión abra la votación, podrás votar.</div></div></div>';
 }
 function teamR3(){
   var mine=r3img(myId);var tries=r3tries(myId);var esl=r3eslogan(myId);
-  var withImgs=teams.filter(function(t){return r3img(t.id);});
-  var gal="";
-  if(withImgs.length){var mv=myR3vote();
-    gal='<div class="score-title" style="margin-top:10px">GALERÍA — vota el mejor anuncio</div><div class="galgrid">'+teams.map(function(t){var im=r3img(t.id);if(!im)return "";var voted=mv===t.id;var canVote=t.id!==myId;return '<div class="galcard"><div class="galimg"><img src="'+im+'" alt=""></div><div class="gnm"><span>'+esc(t.name)+'</span><span class="votes">'+r3votesFor(t.id)+' ★</span></div>'+(r3eslogan(t.id)?'<div style="padding:0 10px 6px;font-size:12px;color:var(--mut)">“'+esc(r3eslogan(t.id))+'”</div>':'')+(canVote?'<button class="votebtn2'+(voted?" voted":"")+'" data-action="r3vote" data-id="'+t.id+'">'+(voted?"✔ Tu voto":"Votar")+'</button>':'<div class="votebtn2" style="opacity:.5;cursor:default">Tu equipo</div>')+'</div>';}).join("")+'</div>';}
+  if(game.r3.voting){
+    var alloc=myR3alloc();var left=8-r3Spent(myId);
+    var grid=teams.map(function(t){var im=r3img(t.id);var mp=alloc[t.id]||0;var me=t.id===myId;var pd=((me&&mp>=2)||left<=0)?" disabled":"";return '<div class="galcard"><div class="galimg">'+(im?'<img src="'+im+'" alt="">':'<div class="noimg2">sin imagen</div>')+'</div><div class="gnm"><span>'+esc(t.name)+(me?" (tú)":"")+'</span><span class="votes">'+r3Received(t.id)+' ★</span></div>'+(r3eslogan(t.id)?'<div style="padding:0 10px 6px;font-size:12px;color:var(--mut)">“'+esc(r3eslogan(t.id))+'”</div>':'')+'<div class="allocrow"><button class="abtn" data-action="r3Alloc" data-id="'+t.id+'" data-d="-2"'+(mp<=0?" disabled":"")+'>−</button><span class="apts">'+mp+'</span><button class="abtn plus" data-action="r3Alloc" data-id="'+t.id+'" data-d="2"'+pd+'>+2</button></div></div>';}).join("");
+    return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 3 · ¡A VOTAR!</div><h2>Reparte tus 8 puntos</h2><p>Da <b>+2</b> a los mejores anuncios. Máx 2 a tu propio equipo. Te quedan <b>'+left+'</b>.</p></div>'+timerChip()+'<div class="qwrap"><div class="galgrid">'+grid+'</div></div></div>';
+  }
   var uploadBox = mine
     ? '<div class="refbox" style="margin-top:8px"><span class="rl">TU ANUNCIO · INTENTO '+tries+' DE 3</span><div class="refimg"><img src="'+mine+'" alt=""></div></div>'+(tries<3?'<label class="btn btn-ghost btn-sm" style="cursor:pointer;margin-top:6px">🔄 Cambiar (te quedan '+(3-tries)+')<input type="file" accept="image/*" data-file="r3img" style="display:none"></label>':'<div class="tag ok" style="margin-top:6px">Imagen final ✔ (3/3)</div>')
     : '<label class="btn btn-cyan btn-lg" style="cursor:pointer">📤 Subir mi anuncio<input type="file" accept="image/*" data-file="r3img" style="display:none"></label><div class="kbd" style="margin-top:4px">Tienes 3 intentos</div>';
-  return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 3</div><h2>Crea el anuncio</h2></div>'+timerChip()+'<div class="qwrap"><div class="glass brief" style="max-width:640px"><span class="lbl">EL RETO</span>'+esc(game.r3.brief)+'</div><textarea class="input" id="sloganIn" style="max-width:560px;min-height:80px" placeholder="Tu eslogan aquí...">'+esc(esl)+'</textarea><button class="btn btn-ghost btn-sm" data-action="sendCreative">💾 Guardar eslogan</button>'+uploadBox+gal+'</div></div>';
+  return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 3</div><h2>Crea el anuncio</h2></div>'+timerChip()+'<div class="qwrap"><div class="glass brief" style="max-width:640px"><span class="lbl">EL RETO</span>'+esc(game.r3.brief)+'</div><textarea class="input" id="sloganIn" style="max-width:560px;min-height:80px" placeholder="Tu eslogan aquí...">'+esc(esl)+'</textarea><button class="btn btn-ghost btn-sm" data-action="sendCreative">💾 Guardar eslogan</button>'+uploadBox+'<div class="kbd" style="margin-top:6px">Cuando el anfitrión abra la votación, podrás votar.</div></div></div>';
 }
 
 /* ---------- Modal (host prep R1) ---------- */
@@ -841,8 +872,12 @@ var actions={
 
   // R2/R3 host
   award:function(el,e){addScore(el.dataset.id,parseInt(el.dataset.d,10),e);},
-  r2vote:function(el){var c=el.dataset.id;if(DB)DB.doc("answers/rv_"+myId).set({kind:"r2vote",teamId:myId,choice:c}).catch(handleWErr);sfxUp();render();},
-  r3vote:function(el){var c=el.dataset.id;if(DB)DB.doc("answers/rv3_"+myId).set({kind:"r3vote",teamId:myId,choice:c}).catch(handleWErr);sfxUp();render();},
+  r2Alloc:function(el){allocChange("r2",el.dataset.id,parseInt(el.dataset.d,10));},
+  r3Alloc:function(el){allocChange("r3",el.dataset.id,parseInt(el.dataset.d,10));},
+  r2ToggleVote:function(){game.r2.voting=!game.r2.voting;saveGame();if(game.r2.voting){narr("¡Es hora de votar! Reparte tus 6 puntos entre los equipos.");showFX("🗳️","¡A VOTAR!","neutral",sfxWhoosh);}render();},
+  r3ToggleVote:function(){game.r3.voting=!game.r3.voting;saveGame();if(game.r3.voting){narr("¡Es hora de votar! Reparte tus 8 puntos entre los equipos.");showFX("🗳️","¡A VOTAR!","neutral",sfxWhoosh);}render();},
+  r2Apply:function(){if(game.r2.applied){flash("Los votos ya se aplicaron");return;}teams.forEach(function(t){scores[t.id]=(scores[t.id]||0)+r2Received(t.id);});game.r2.applied=true;saveScores();saveGame();sfxCorrect();render();},
+  r3Apply:function(){if(game.r3.applied){flash("Los votos ya se aplicaron");return;}teams.forEach(function(t){scores[t.id]=(scores[t.id]||0)+r3Received(t.id);});game.r3.applied=true;saveScores();saveGame();sfxCorrect();render();},
   loadR3Brief:function(){game.r3.brief=R3_BRIEF;saveGame();render();},
   revealPrompt:function(){var i=document.getElementById("r2note");if(i){game.r2.note=i.value;}game.r2.revealed=true;saveGame();scrambleReveal(game.r2.note);render();},
   briefEdit:function(){var cur=game.r3.brief;var nv=prompt("Edita el brief del Reto 3:",cur);if(nv!=null){game.r3.brief=nv;saveGame();render();}},
