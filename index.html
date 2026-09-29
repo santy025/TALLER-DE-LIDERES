@@ -226,14 +226,77 @@ label.fld{display:block;font-family:var(--mono);font-size:11px;color:var(--cyan)
 .prep-card .ta.real{color:var(--cyan);border:1px solid var(--cyan)}
 .prep-card .ta.ia{color:var(--magenta2);border:1px solid var(--magenta)}
 .prep-del{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.62);color:#fff;cursor:pointer;font-size:12px;line-height:1}
+.live-stage{padding-bottom:104px}
+.live-split{display:flex;gap:26px;align-items:flex-start;width:100%;flex-wrap:wrap;justify-content:center}
+.live-main{flex:1;min-width:300px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.live-side{width:min(360px,94vw)}
+.livebar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(6,2,14,.85);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.livebar-in{display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:1200px;margin:0 auto}
 @media (max-width:760px){.brow{grid-template-columns:40px 46px 1fr auto;gap:10px;padding:12px}.nav{width:100%;justify-content:flex-start}.hudinfo{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}.bg-grid,.hero-title,.champ{animation:none}}
+
+/* ============================ REMASTER ============================ */
+html{scrollbar-color:var(--magenta) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--magenta),var(--violet));border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+::selection{background:rgba(255,45,155,.42);color:#fff}
+.bg-base{background:
+  radial-gradient(1200px 720px at 6% -10%,rgba(255,45,155,.26),transparent 56%),
+  radial-gradient(1100px 720px at 104% 2%,rgba(47,240,255,.20),transparent 54%),
+  radial-gradient(1000px 1000px at 82% 120%,rgba(167,139,250,.24),transparent 60%),
+  radial-gradient(760px 520px at 50% 46%,rgba(120,60,200,.10),transparent 72%),
+  linear-gradient(165deg,#0c0620,#050110 74%)}
+.bg-base::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 95% at 50% 0%,transparent 52%,rgba(0,0,0,.6) 100%)}
+@keyframes aurora{0%{transform:translate3d(-6%,0,0);opacity:.55}50%{transform:translate3d(6%,2%,0);opacity:.85}100%{transform:translate3d(-6%,0,0);opacity:.55}}
+.aurora{position:fixed;left:-10%;right:-10%;top:-18%;height:72vh;z-index:-2;pointer-events:none;filter:blur(64px);opacity:.9;background:
+  radial-gradient(closest-side,rgba(255,45,155,.34),transparent 70%) 12% 24%/38% 60% no-repeat,
+  radial-gradient(closest-side,rgba(47,240,255,.26),transparent 70%) 82% 8%/42% 56% no-repeat,
+  radial-gradient(closest-side,rgba(167,139,250,.28),transparent 70%) 50% 42%/46% 64% no-repeat;
+  animation:aurora 16s ease-in-out infinite}
+.bg-grid{opacity:.62}
+.stage{animation:none}
+.glass{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);box-shadow:0 12px 44px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.07)}
+.btn{letter-spacing:.2px}
+.btn-primary{background:linear-gradient(135deg,#ff2d9b,#c026d3 55%,#7c3aed);box-shadow:0 8px 30px rgba(255,45,155,.5),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-cyan{background:linear-gradient(135deg,#2ff0ff,#3b82f6);box-shadow:0 8px 30px rgba(47,240,255,.45),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-ghost{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+.pill.hot{box-shadow:0 0 28px rgba(255,45,155,.35),inset 0 0 22px rgba(255,45,155,.12)}
+.hero-title{filter:drop-shadow(0 10px 64px rgba(255,45,155,.5))}
+.input{background:rgba(0,0,0,.34);border-color:rgba(255,255,255,.10)}
+.input:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(255,45,155,.18),0 0 26px rgba(255,45,155,.15)}
+.seg{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.10)}
+.seg button.on{box-shadow:0 6px 20px rgba(255,45,155,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+.iconbtn{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+.topbar{background:linear-gradient(180deg,rgba(10,4,22,.72),rgba(6,2,14,.5));box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.score-title{letter-spacing:2px;text-transform:uppercase;color:var(--cyan);opacity:.92}
+.srow{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border-color:rgba(255,255,255,.09)}
+.srow.top{background:linear-gradient(90deg,rgba(255,207,77,.18),rgba(255,45,155,.10));border-color:rgba(255,207,77,.55);box-shadow:0 0 26px rgba(255,207,77,.24)}
+.brow{border-color:rgba(255,255,255,.09)}
+.brow.top{position:relative;box-shadow:0 16px 50px rgba(255,45,155,.3),inset 0 0 0 1px rgba(255,207,77,.5);animation:leaderpulse 2.4s ease-in-out infinite}
+@keyframes leaderpulse{50%{box-shadow:0 20px 62px rgba(255,207,77,.42),inset 0 0 0 1px rgba(255,207,77,.85)}}
+.crown{position:absolute;top:-15px;left:8px;font-size:22px;filter:drop-shadow(0 0 10px rgba(255,207,77,.85));animation:crownfloat 2.4s ease-in-out infinite;pointer-events:none;z-index:2}
+@keyframes crownfloat{50%{transform:translateY(-3px) rotate(-7deg)}}
+.bar-fill{box-shadow:0 0 20px rgba(255,45,155,.55)}
+.track{box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.tcard{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+.avatar{box-shadow:0 8px 26px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.14),0 0 28px rgba(167,139,250,.35)}
+.reveal{filter:drop-shadow(0 0 34px currentColor)}
+.tdisplay{text-shadow:0 0 44px rgba(255,255,255,.25)}
+.live-stage{padding-top:6px}
+.livebar{background:linear-gradient(180deg,rgba(10,4,22,.55),rgba(6,2,14,.94));box-shadow:0 -14px 44px rgba(0,0,0,.55)}
+.fxbtn{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.fxbtn:hover{box-shadow:0 10px 26px rgba(0,0,0,.45)}
+.qimg,.target{box-shadow:0 26px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06),0 0 60px rgba(120,60,200,.18)}
+.vote2 .votebtn{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+@media (prefers-reduced-motion:reduce){.aurora{animation:none}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="bg-base"></div>
+<div class="aurora"></div>
 <div class="bg-grid"></div>
 <canvas id="bg"></canvas>
 <div class="scan"></div>
@@ -256,6 +319,8 @@ var FIREBASE_CONFIG = {
   appId: "TU_APP_ID"
 };
 function fbConfigured(){return !!(FIREBASE_CONFIG&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.projectId.indexOf("TU_")!==0);}
+/* Clave del anfitrión. Vacía ("") = cualquier clave sirve. Pon una para exigirla, ej: "cin2026". */
+var ADMIN_KEY="";
 var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 var COLORS=["#ff2d9b","#2ff0ff","#a78bfa","#ffcf4d","#3ef0a8","#f472b6","#60a5fa","#fb923c","#4ade80","#e879f9","#2dd4bf","#f87171"];
 var EMOJIS=["🚀","🦊","🐉","⚡","🔥","🎯","🧠","🐙","🦁","🐝","🛰️","🎨","🤖","🌟","🦈","🐼"];
@@ -286,17 +351,24 @@ var sfxApplause=function(){if(!soundOn)return;var c=ac();if(!c)return;try{var du
 
 /* ---------------- Voice (TTS) ---------------- */
 var voices=[];
+var voiceURI=localStorage.getItem("torneoIA_voiceURI")||"";
+var voiceRate=parseFloat(localStorage.getItem("torneoIA_voiceRate")||"1")||1;
+var voicePitch=parseFloat(localStorage.getItem("torneoIA_voicePitch")||"1")||1;
+var narrate=(localStorage.getItem("torneoIA_narrate")!=="0");
 function loadVoices(){try{voices=speechSynthesis.getVoices()||[];}catch(e){voices=[];}}
 if(window.speechSynthesis){loadVoices();try{speechSynthesis.onvoiceschanged=loadVoices;}catch(e){}}
+function pickVoice(){
+  loadVoices();
+  if(voiceURI){var vv=voices.find(function(x){return x.voiceURI===voiceURI||x.name===voiceURI;});if(vv)return vv;}
+  var es=voices.filter(function(x){return /es(-|_)/i.test(x.lang);});
+  if(es.length){var pref=es.find(function(x){return /es-ES|es-US|es-MX|Google|Microsoft|Helena|Sabina|Laura|Jorge|Pablo|Elvira/i.test(x.lang+" "+x.name);});return pref||es[0];}
+  return voices[0]||null;
+}
 function speak(text){
   if(!window.speechSynthesis)return;
-  try{speechSynthesis.cancel();loadVoices();
-    var u=new SpeechSynthesisUtterance(text);u.lang="es-ES";u.rate=1;u.pitch=1;u.volume=1;
-    var v=voices.filter(function(x){return /es(-|_)/i.test(x.lang);});
-    if(v.length){var pref=v.find(function(x){return /es-ES|es-US|es-MX|Spanish/i.test(x.lang+x.name);});u.voice=pref||v[0];}
-    speechSynthesis.speak(u);
-  }catch(e){}
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);var v=pickVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang="es-ES";u.rate=voiceRate;u.pitch=voicePitch;u.volume=1;speechSynthesis.speak(u);}catch(e){}
 }
+function narr(text){if(narrate)speak(text);}
 
 /* ---------------- FX overlay ---------------- */
 var app=document.getElementById("app"), fxTimeout=null;
@@ -352,6 +424,9 @@ var ISOWNER=false, ISADMIN=false, CANWRITE=true, myId=null, role="team", forcedR
 var game=defaultGame(), teams=[], scores={}, media={}, answers={};
 var draft={name:"",photo:null}, camStream=null, modal=null, scanning=false, hostView="lobby";
 var goMins=5;
+var isAdmin=(function(){var h=(location.hash||"").toLowerCase();if(h.indexOf("team")>=0)return false;if(h.indexOf("admin")>=0||h.indexOf("host")>=0)return true;try{return localStorage.getItem("torneoIA_admin")==="1";}catch(e){return false;}})();
+var adminMode=(function(){try{return localStorage.getItem("torneoIA_adminMode")||"config";}catch(e){return "config";}})();
+var entryChoice=null;
 var lastTimerLeft=null;
 
 function readHash(){var h=(location.hash||"").replace("#","");if(h==="host"||h==="team")forcedRole=h;}
@@ -380,7 +455,7 @@ function flash(msg){var d=document.createElement("div");d.textContent=msg;d.styl
 function timerLeft(){var t=game.timer||{};if(t.running&&t.endsAt)return Math.max(0,Math.round((t.endsAt-Date.now())/1000));return t.total||0;}
 function timerChip(){var t=game.timer||{};if(!t.running&&!((t.total||0)>0))return "";return '<div style="text-align:center;margin-top:-4px"><div class="tdisplay" id="tdisplay" style="font-size:clamp(26px,5vw,42px)">'+fmtT(timerLeft())+'</div></div>';}
 function timerPaint(){var d=document.getElementById("tdisplay");var left=timerLeft();if(d){d.textContent=fmtT(left);d.classList.toggle("low",(game.timer&&game.timer.running)&&left<=10&&left>0);}
-  if(game.timer&&game.timer.running){if(left<=10&&left>0&&lastTimerLeft!==left&&role==="host")sfxTick();if(left===0&&lastTimerLeft>0&&role==="host"){if(game.timer){game.timer.running=false;game.timer.total=0;}if(DB)DB.doc("game/state").set(game).catch(function(){});showFX("⏰","¡TIEMPO!","warn",sfxTimeUp);render();}}
+  if(game.timer&&game.timer.running){if(left<=10&&left>0&&lastTimerLeft!==left&&role==="host")sfxTick();if(left===0&&lastTimerLeft>0&&role==="host"){if(game.timer){game.timer.running=false;game.timer.total=0;}if(DB)DB.doc("game/state").set(game).catch(function(){});showFX("⏰","¡TIEMPO!","warn",sfxTimeUp);narr("¡Se acabó el tiempo!");render();}}
   lastTimerLeft=left;
 }
 setInterval(timerPaint,300);
@@ -393,8 +468,12 @@ function render(){
   if(!dbReady){app.innerHTML=connectingView();return;}
   var ae=document.activeElement,aid=ae&&ae.id,aval=null,asel=null;
   if(aid&&(ae.tagName==="INPUT"||ae.tagName==="TEXTAREA")){aval=ae.value;try{asel=[ae.selectionStart,ae.selectionEnd];}catch(e){}}
-  var body = role==="host" ? hostRender() : teamRender();
-  app.innerHTML = topbar()+body+modalView();
+  var html;
+  if(isAdmin){html=topbar()+adminBody()+modalView();}
+  else if(entryChoice==="adminlogin"){html=adminLoginView();}
+  else if(myTeam()||entryChoice==="team"){html=topbar()+teamRender()+modalView();}
+  else{html=landingView();}
+  app.innerHTML = html;
   if(aid){var re=document.getElementById(aid);if(re&&(re.tagName==="INPUT"||re.tagName==="TEXTAREA")){if(aval!=null&&aval!==re.value)re.value=aval;try{re.focus();if(asel&&re.setSelectionRange)re.setSelectionRange(asel[0],asel[1]);}catch(e){}}}
   requestAnimationFrame(function(){document.querySelectorAll(".bar-fill[data-w]").forEach(function(b){b.style.width=b.dataset.w;});});
   timerPaint();
@@ -403,18 +482,23 @@ function render(){
 function connectingView(){return '<div class="stage"><div class="center"><div class="pill hot">CONECTANDO…</div><h1 class="hero-title" style="font-size:clamp(40px,9vw,90px)">Torneo de IA</h1><p class="hero-sub">Enlazando con la sala…</p></div></div>';}
 
 function topbar(){
+  var sound='<button class="iconbtn" data-action="soundToggle" title="Sonido">'+(soundOn?"🔊":"🔇")+'</button>';
+  var voice='<button class="iconbtn" data-action="voiceOpen" title="Voz y narración">🎙️</button>';
   var right="";
-  if(role==="host"){
-    function seg(l,v){return '<button class="'+(hostView===v?"on":"")+'" data-action="hostGo" data-v="'+v+'">'+l+'</button>';}
-    right='<div class="seg">'+seg("Lobby","lobby")+seg("R1","r1")+seg("R2","r2")+seg("R3","r3")+seg("Tablero","board")+seg("Podio","podium")+'</div>'+
-      '<button class="iconbtn" data-action="soundToggle" title="Sonido">'+(soundOn?"🔊":"🔇")+'</button>'+
-      '<button class="iconbtn" data-action="reset" title="Reiniciar">⟲</button>';
+  if(isAdmin){
+    var modeSw='<div class="seg"><button class="'+(adminMode==="config"?"on":"")+'" data-action="adminMode" data-m="config">⚙️ Configurar</button><button class="'+(adminMode==="live"?"on":"")+'" data-action="adminMode" data-m="live">📺 En vivo</button></div>';
+    var seg="";
+    if(adminMode==="config"){
+      function sg(l,v){return '<button class="'+(hostView===v?"on":"")+'" data-action="hostGo" data-v="'+v+'">'+l+'</button>';}
+      seg='<div class="seg">'+sg("Lobby","lobby")+sg("R1","r1")+sg("R2","r2")+sg("R3","r3")+sg("Tablero","board")+sg("Podio","podium")+'</div>';
+    }
+    right=modeSw+seg+voice+sound+'<button class="iconbtn" data-action="reset" title="Reiniciar">⟲</button><button class="iconbtn" data-action="adminLogout" title="Salir del anfitrión">⎋</button>';
   } else {
-    right='<span class="kbd">EQUIPO'+(myTeam()?" · "+esc(myTeam().name):"")+'</span>'+'<button class="iconbtn" data-action="soundToggle" title="Sonido">'+(soundOn?"🔊":"🔇")+'</button>';
+    right='<span class="kbd">EQUIPO'+(myTeam()?" · "+esc(myTeam().name):"")+'</span>'+sound;
   }
   var conn=online?'<span class="live"><span class="dot"></span>EN VIVO</span>':'<span class="live"><span class="dot off"></span>LOCAL</span>';
-  return '<div class="topbar"><div class="brand"><div class="logo">🤖</div><div><b>TORNEO IA</b><span class="sfx-mono">// CIN · '+(role==="host"?"ANFITRIÓN":"EQUIPO")+'</span></div></div>'+
-    '<div class="hudinfo">'+conn+'<span id="clock">--:--:--</span><span>◆ <b>'+teams.length+'</b> EQUIPOS</span></div>'+
+  return '<div class="topbar"><div class="brand"><div class="logo">🤖</div><div><b>TORNEO IA</b><span class="sfx-mono">// CIN · '+(isAdmin?"ANFITRIÓN":"EQUIPO")+'</span></div></div>'+
+    '<div class="hudinfo">'+conn+(isAdmin?('<span>▣ '+({lobby:"SALA",r1:"RETO 1",r2:"RETO 2",r3:"RETO 3",board:"TABLERO",podium:"PODIO"}[game.phase]||"")+'</span>'):"")+'<span id="clock">--:--:--</span><span>◆ <b>'+teams.length+'</b> EQUIPOS</span>'+(isAdmin&&teams.length?('<span style="color:var(--gold)">★ <b>'+esc(sortedTeams()[0].name)+'</b></span>'):"")+'</div>'+
     '<div class="nav">'+right+'</div></div>';
 }
 
@@ -441,18 +525,76 @@ function showbar(){
 function leaderboard(){
   if(!teams.length)return '<div class="empty">// AÚN NO HAY EQUIPOS</div>';
   var s=sortedTeams(),max=Math.max(1,scoreOf(s[0].id)),med=["🥇","🥈","🥉"];
-  return '<div class="board">'+s.map(function(t,i){var w=Math.max(6,Math.round(scoreOf(t.id)/max*100));return '<div class="brow'+(i===0&&scoreOf(t.id)>0?" top holo":"")+'"><div class="rk">'+(i<3?med[i]:(i+1))+'</div>'+avatarHTML(t,"bav")+'<div class="bmid"><div class="bn">'+esc(t.name)+'</div><div class="track"><div class="bar-fill" data-w="'+w+'%"></div></div></div><div class="bpts">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
+  return '<div class="board">'+s.map(function(t,i){var w=Math.max(6,Math.round(scoreOf(t.id)/max*100));return '<div class="brow'+(i===0&&scoreOf(t.id)>0?" top holo":"")+'">'+(i===0&&scoreOf(t.id)>0?'<span class="crown">👑</span>':"")+'<div class="rk">'+(i<3?med[i]:(i+1))+'</div>'+avatarHTML(t,"bav")+'<div class="bmid"><div class="bn">'+esc(t.name)+'</div><div class="track"><div class="bar-fill" data-w="'+w+'%"></div></div></div><div class="bpts">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
 }
 
 /* ================= HOST ================= */
 function miniBoard(){
   if(!teams.length)return '<div class="score-wrap" style="max-width:520px"><div class="score-title">🎮 GAMIFICADOR</div><div class="empty" style="padding:14px">// esperando equipos…</div></div>';
   var s=sortedTeams().slice(0,6),max=Math.max(1,scoreOf(s[0].id)),med=["🥇","🥈","🥉"];
-  return '<div class="score-wrap" style="max-width:560px"><div class="score-title">🎮 GAMIFICADOR · EN VIVO</div>'+s.map(function(t,i){var w=Math.max(8,Math.round(scoreOf(t.id)/max*100));return '<div class="srow" style="padding:8px 12px"><div style="width:22px;text-align:center;font-family:var(--disp);font-weight:800;color:'+(i===0?"var(--gold)":"var(--mut)")+'">'+(i<3?med[i]:(i+1))+'</div>'+avatarHTML(t,"av")+'<div style="flex:1;min-width:0"><div class="snm">'+esc(t.name)+'</div><div class="track" style="height:8px;margin-top:5px"><div class="bar-fill" style="width:'+w+'%"></div></div></div><div class="sc" style="font-size:20px">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
+  return '<div class="score-wrap" style="max-width:560px"><div class="score-title">🎮 GAMIFICADOR · EN VIVO</div>'+s.map(function(t,i){var w=Math.max(8,Math.round(scoreOf(t.id)/max*100));return '<div class="srow'+(i===0&&scoreOf(t.id)>0?" top":"")+'" style="padding:8px 12px;position:relative">'+(i===0&&scoreOf(t.id)>0?'<span class="crown" style="top:-12px;left:2px;font-size:18px">👑</span>':"")+'<div style="width:22px;text-align:center;font-family:var(--disp);font-weight:800;color:'+(i===0?"var(--gold)":"var(--mut)")+'">'+(i<3?med[i]:(i+1))+'</div>'+avatarHTML(t,"av")+'<div style="flex:1;min-width:0"><div class="snm">'+esc(t.name)+'</div><div class="track" style="height:8px;margin-top:5px"><div class="bar-fill" style="width:'+w+'%"></div></div></div><div class="sc" style="font-size:20px">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
 }
 function goBar(r){
   function mb(m){return '<button class="pbtn'+(goMins===m?" plus":"")+'" data-action="goMins" data-m="'+m+'">'+m+' min</button>';}
   return '<div class="showbar" style="max-width:600px"><div class="lbl">▶ DAR EL GO A LOS EQUIPOS</div><div class="tctrls" style="justify-content:center;align-items:center"><span class="kbd">Tiempo:</span>'+mb(3)+mb(5)+mb(10)+'<input class="input" id="goCustom" style="width:84px;padding:8px" placeholder="min" inputmode="numeric"></div><div style="text-align:center;margin-top:6px"><button class="btn btn-cyan btn-lg" data-action="giveGo" data-r="'+r+'">▶ ¡DAR GO! ('+goMins+' min)</button></div></div>';
+}
+function adminBody(){ return adminMode==="live" ? liveView() : hostRender(); }
+
+function landingView(){
+  return '<div class="stage"><div class="center"><div class="pill hot">TORNEO DE IA · CIN</div><h1 class="hero-title">Torneo de IA</h1><p class="hero-sub">¿Cómo vas a entrar?</p><div class="rounds3" style="margin-top:20px"><div class="glass rcard holo" style="cursor:pointer;text-align:center" data-action="chooseTeam"><div style="font-size:54px">🧑‍🤝‍🧑</div><h4 style="justify-content:center">Soy un equipo</h4><p>Únete con el nombre y la foto de tu equipo y participa desde tu computador.</p><div style="margin-top:14px"><span class="btn btn-primary">Entrar como equipo ▸</span></div></div><div class="glass rcard" style="cursor:pointer;text-align:center" data-action="chooseAdmin"><div style="font-size:54px">🎛️</div><h4 style="justify-content:center">Soy el anfitrión</h4><p>Controlas el torneo y proyectas la pantalla grande. Requiere clave.</p><div style="margin-top:14px"><span class="btn btn-ghost">Entrar como anfitrión 🔒</span></div></div></div></div></div>';
+}
+function adminLoginView(){
+  return '<div class="stage"><div class="center"><div class="pill hot">ACCESO ANFITRIÓN</div><h1 class="hero-title" style="font-size:clamp(40px,8vw,90px)">Clave</h1><div class="glass panel" style="max-width:400px;width:100%;text-align:center"><label class="fld" style="text-align:left">CLAVE DEL ANFITRIÓN</label><input class="input" id="adminKey" type="password" placeholder="Escribe tu clave" autocomplete="off"><div id="adminErr" style="color:var(--magenta);font-size:13px;min-height:18px;margin-top:8px"></div><button class="btn btn-primary btn-lg" data-action="adminLogin" style="width:100%;margin-top:4px">Entrar ▸</button><button class="btn btn-ghost btn-sm" data-action="chooseBack" style="margin-top:10px">◂ Volver</button></div></div></div>';
+}
+
+function liveTimerBig(){var t=game.timer||{};if(!t.running&&!((t.total||0)>0))return "";return '<div class="tdisplay" id="tdisplay" style="font-size:clamp(48px,9vw,112px)">'+fmtT(timerLeft())+'</div>';}
+function goMinsBtns(){function mb(m){return '<button class="pbtn'+(goMins===m?" plus":"")+'" data-action="goMins" data-m="'+m+'">'+m+'m</button>';}return mb(3)+mb(5)+mb(10);}
+function ttoggleBtn(){var t=game.timer||{};return '<button class="fxbtn neutral" data-action="ttoggle">'+((t.running)?"⏸":"▶")+' crono</button><button class="fxbtn neutral" data-action="treset">↺</button>';}
+
+function liveLobby(){
+  var link=location.origin+location.pathname;
+  var cards=teams.length?teams.map(function(t){return '<div class="glass tcard">'+avatarHTML(t,"avatar")+'<div class="nm">'+esc(t.name)+'</div></div>';}).join(""):'<div class="empty">// ESPERANDO EQUIPOS…</div>';
+  return '<div class="center"><div class="pill hot">SALA DE ESPERA</div><h1 class="hero-title" style="font-size:clamp(40px,8vw,96px)">¡Únete!</h1><p class="hero-sub">Entra desde tu computador a:</p><div class="glass" style="padding:14px 22px;border-radius:16px;font-family:var(--mono);font-size:clamp(15px,2.4vw,24px);color:var(--cyan);word-break:break-all;max-width:760px">'+esc(link)+'</div><div style="margin-top:6px"><span class="kbd">'+teams.length+' EQUIPOS CONECTADOS</span></div><div class="tgrid" style="margin-top:14px;width:100%">'+cards+'</div></div>';
+}
+function liveR1(){
+  var items=game.r1.items,it=items[game.r1.idx],center;
+  if(!it){center='<div class="qimg" style="max-width:840px"><div class="noimg">Prepara y muestra una imagen desde ⚙️ Configurar.</div></div>';}
+  else{
+    var m=it.mid?media[it.mid]:null;var img=m?'<img src="'+m+'" alt="">':'<div class="noimg">👀 Mira la imagen</div>';
+    var voters=teams.filter(function(t){return voteFor(it.id,t.id);}).length,below;
+    if(it.revealed){below='<div class="reveal '+(it.answer==="REAL"?"real":"ia")+'" style="margin-top:10px">'+(it.answer==="REAL"?"REAL ✔":"ERA IA 🤖")+'</div>';}
+    else{below='<div class="tag wait" style="margin-top:10px;font-size:18px">🗳️ '+voters+' / '+teams.length+' votaron</div>';}
+    center='<div class="qimg" style="max-width:840px"><div class="qn">IMAGEN '+(game.r1.idx+1)+' / '+items.length+'</div>'+img+'</div>'+below;
+  }
+  return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 1 · ¿REAL O IA?</div></div>'+liveTimerBig()+center+'</div><div class="live-side">'+miniBoard()+'</div></div>';
+}
+function liveR2(){
+  var m=game.r2.mid?media[game.r2.mid]:null;var img=m?'<img src="'+m+'" alt="">':'<div class="noimg">Sube la imagen desde ⚙️ Configurar</div>';
+  var got=ansList("prompt").length;
+  return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 2 · ADIVINA EL PROMPT</div></div>'+liveTimerBig()+'<div class="target" style="max-width:520px">'+img+'</div><div class="tag wait" style="font-size:18px">✍️ '+got+' / '+teams.length+' enviaron su prompt</div>'+((game.r2.revealed&&game.r2.note)?'<div class="promptreveal" style="position:static">'+esc(game.r2.note)+'</div>':'')+'</div><div class="live-side">'+miniBoard()+'</div></div>';
+}
+function liveR3(){
+  var got=ansList("creative").length;
+  return '<div class="live-split"><div class="live-main"><div class="round-head"><div class="pill hot">RETO 3 · CREA EL CREATIVO</div></div>'+liveTimerBig()+'<div class="glass brief" style="max-width:640px"><span class="lbl">EL RETO</span>'+esc(game.r3.brief)+'</div><div class="tag wait" style="font-size:18px">🎨 '+got+' / '+teams.length+' entregaron</div></div><div class="live-side">'+miniBoard()+'</div></div>';
+}
+function liveBoard(){return '<div class="center"><div class="pill hot">TABLERO EN VIVO</div><h1 class="hero-title" style="font-size:clamp(36px,7vw,82px)">🎮 Gamificador</h1>'+leaderboard()+'</div>';}
+function liveBar(){
+  var p=game.phase,a="";
+  function b(action,label,cls,data){return '<button class="fxbtn '+(cls||"neutral")+'" data-action="'+action+'"'+(data||"")+'>'+label+'</button>';}
+  if(p==="lobby"){a=b("startR1","▶ Comenzar Reto 1","good");}
+  else if(p==="r1"){a='<span class="kbd">Tiempo:</span>'+goMinsBtns()+b("giveGo","▶ GO","good",' data-r="1"')+b("say","🎙️ Explicar","neutral",' data-r="1"')+b("r1Prev","◂","neutral")+b("r1Reveal","🔍 Revelar","warn")+b("r1Next","▸","neutral")+b("hostGo","Reto 2 ▸","neutral",' data-v="r2"');}
+  else if(p==="r2"){a='<span class="kbd">Tiempo:</span>'+goMinsBtns()+b("giveGo","▶ GO","good",' data-r="2"')+b("say","🎙️ Explicar","neutral",' data-r="2"')+b("revealPrompt","Revelar prompt","warn")+b("hostGo","Reto 3 ▸","neutral",' data-v="r3"');}
+  else if(p==="r3"){a='<span class="kbd">Tiempo:</span>'+goMinsBtns()+b("giveGo","▶ GO","good",' data-r="3"')+b("say","🎙️ Explicar","neutral",' data-r="3"')+b("hostGo","Tablero ▸","neutral",' data-v="board"');}
+  else if(p==="board"){a=b("hostGo","◂ Volver","neutral",' data-v="r'+game.round+'"')+b("hostGo","Podio 🏆","warn",' data-v="podium"');}
+  else if(p==="podium"){a=b("hostGo","◂ Tablero","neutral",' data-v="board"')+b("reset","Nuevo torneo","neutral");}
+  return '<div class="livebar"><div class="livebar-in">'+a+'<span style="flex:1"></span>'+ttoggleBtn()+'</div></div>';
+}
+function liveView(){
+  var p=game.phase;
+  if(p==="podium") return hostPodium()+liveBar();
+  var content;
+  if(p==="r1") content=liveR1(); else if(p==="r2") content=liveR2(); else if(p==="r3") content=liveR3(); else if(p==="board") content=liveBoard(); else content=liveLobby();
+  return '<div class="stage live-stage">'+content+'</div>'+liveBar();
 }
 function hostRender(){
   var v=hostView;
@@ -574,8 +716,22 @@ function teamR3(){
 }
 
 /* ---------- Modal (host prep R1) ---------- */
+function voiceModal(){
+  loadVoices();
+  var es=voices.filter(function(v){return /es(-|_)/i.test(v.lang);});
+  var others=voices.filter(function(v){return !/es(-|_)/i.test(v.lang);});
+  function opt(v){var sel=(v.voiceURI===voiceURI||v.name===voiceURI)?" selected":"";return '<option value="'+esc(v.voiceURI)+'"'+sel+'>'+esc(v.name+" — "+v.lang)+'</option>';}
+  var options=(es.length?'<optgroup label="Español">'+es.map(opt).join("")+'</optgroup>':'')+(others.length?'<optgroup label="Otros idiomas">'+others.map(opt).join("")+'</optgroup>':'');
+  var body=voices.length?'<label class="fld">VOZ DEL PRESENTADOR</label><select class="input" id="voiceSel">'+options+'</select>':'<div class="empty" style="padding:18px">Cargando voces del navegador… <button class="btn btn-ghost btn-sm" data-action="voiceOpen">Actualizar</button></div>';
+  return '<div class="modal-bg" data-action="modalClose"><div class="modal"><h3>🎙️ Voz y narración</h3><p class="hint" style="color:var(--mut);margin:-6px 0 14px">Elige la voz que presenta los retos. Depende de tu navegador y sistema — en <b>Chrome</b> o <b>Edge</b> suelen venir voces en español más naturales (ej. “Google español”, “Microsoft Sabina/Helena”). Consejo: instala un idioma de voz en tu sistema para tener más opciones.</p>'+body+
+    '<div style="margin-top:16px"><label class="fld">VELOCIDAD · <span id="rateVal">'+voiceRate.toFixed(2)+'</span></label><input type="range" id="rateSl" min="0.6" max="1.4" step="0.05" value="'+voiceRate+'" style="width:100%;accent-color:var(--magenta)"></div>'+
+    '<div style="margin-top:12px"><label class="fld">TONO · <span id="pitchVal">'+voicePitch.toFixed(2)+'</span></label><input type="range" id="pitchSl" min="0.6" max="1.4" step="0.05" value="'+voicePitch+'" style="width:100%;accent-color:var(--cyan)"></div>'+
+    '<div style="margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button class="btn btn-cyan" data-action="voiceTest">▶ Probar voz</button><button class="btn '+(narrate?"btn-primary":"btn-ghost")+'" data-action="narrToggle">'+(narrate?"🔊 Narración automática: ON":"🔇 Narración automática: OFF")+'</button></div>'+
+    '<div style="margin-top:18px;text-align:right"><button class="btn btn-cyan" data-action="modalClose">Listo ✔</button></div></div></div>';
+}
 function modalView(){
   if(!modal)return "";
+  if(modal.type==="voice")return voiceModal();
   var tab=modal.tab||"IA";
   var count=game.r1.items.length;
   var grid=game.r1.items.map(function(it){var m=it.mid?media[it.mid]:null;var th=m?'<img src="'+m+'" alt="">':'📷';return '<div class="prep-card"><div class="prep-th">'+th+'</div><span class="ta '+(it.answer==="REAL"?"real":"ia")+'">'+(it.answer||"?")+'</span><button class="prep-del" data-action="itemDel" data-id="'+it.id+'">✕</button></div>';}).join("");
@@ -585,8 +741,17 @@ function modalView(){
 /* ================= ACTIONS ================= */
 var actions={
   soundToggle:function(){soundOn=!soundOn;localStorage.setItem("torneoIA_sound",soundOn?"1":"0");if(soundOn){ac();tone(880,0,.1,"triangle",.1);}render();},
+  voiceOpen:function(){modal={type:"voice"};render();},
+  voiceTest:function(){speak("Bienvenidos al torneo de inteligencia artificial del CIN. ¡Prepárense para el primer reto!");},
+  narrToggle:function(){narrate=!narrate;try{localStorage.setItem("torneoIA_narrate",narrate?"1":"0");}catch(e){}render();},
+  chooseTeam:function(){entryChoice="team";render();},
+  chooseAdmin:function(){entryChoice="adminlogin";render();},
+  chooseBack:function(){entryChoice=null;render();},
+  adminLogin:function(){var i=document.getElementById("adminKey");var k=i?i.value:"";var ok=ADMIN_KEY===""?(k.trim().length>0):(k===ADMIN_KEY);if(!ok){var er=document.getElementById("adminErr");if(er)er.textContent=ADMIN_KEY===""?"Escribe cualquier clave para entrar.":"Clave incorrecta.";return;}isAdmin=true;role="host";try{localStorage.setItem("torneoIA_admin","1");}catch(e){}entryChoice=null;ac();render();},
+  adminLogout:function(){isAdmin=false;role="team";try{localStorage.removeItem("torneoIA_admin");}catch(e){}entryChoice=null;render();},
+  adminMode:function(el){adminMode=el.dataset.m;try{localStorage.setItem("torneoIA_adminMode",adminMode);}catch(e){}render();},
   copyLink:function(){var i=document.getElementById("joinlink");if(i){try{navigator.clipboard.writeText(i.value);flash("Link copiado ✔");}catch(e){i.select();flash("Selecciona y copia el link");}}},
-  hostGo:function(el){hostView=el.dataset.v;if(hostView.charAt(0)==="r"&&hostView.length===2){game.phase=hostView;game.round=parseInt(hostView.charAt(1),10);saveGame();}else if(hostView==="board"){game.phase="board";saveGame();}else if(hostView==="podium"){game.phase="podium";saveGame();setTimeout(confettiBurst,900);setTimeout(sfxFanfare,700);}else if(hostView==="lobby"){game.phase="lobby";saveGame();}render();},
+  hostGo:function(el){hostView=el.dataset.v;if(hostView.charAt(0)==="r"&&hostView.length===2){game.phase=hostView;game.round=parseInt(hostView.charAt(1),10);saveGame();}else if(hostView==="board"){game.phase="board";saveGame();var ld=sortedTeams()[0];if(ld)narr("Así va el tablero. En primer lugar, "+ld.name+", con "+scoreOf(ld.id)+" puntos.");}else if(hostView==="podium"){game.phase="podium";saveGame();setTimeout(confettiBurst,900);setTimeout(sfxFanfare,700);var wn=sortedTeams()[0];if(wn)setTimeout(function(){narr("¡Tenemos ganador! El primer lugar es para "+wn.name+", con "+scoreOf(wn.id)+" puntos. ¡Felicitaciones a todos!");},1200);}else if(hostView==="lobby"){game.phase="lobby";saveGame();}render();},
   startR1:function(){ac();hostView="r1";game.phase="r1";game.round=1;saveGame();render();actions.say({dataset:{r:"1"}});},
   reset:function(){if(confirm("¿Reiniciar el torneo? Se borran equipos y puntajes para todos.")){game=defaultGame();scores={};teams.slice().forEach(function(t){if(DB)DB.doc("teams/"+t.id).delete().catch(function(){});});Object.keys(answers).forEach(function(k){if(DB)DB.doc("answers/"+k).delete().catch(function(){});});Object.keys(media).forEach(function(k){if(DB)DB.doc("media/"+k).delete().catch(function(){});});saveGame();saveScores();hostView="lobby";render();}},
 
@@ -601,14 +766,14 @@ var actions={
   r1Quick:function(){game.r1.items.push({id:uid(),mid:null,answer:null,pista:"",revealed:false,scored:false});game.r1.idx=game.r1.items.length-1;saveGame();render();},
   r1Prev:function(){if(game.r1.idx>0){game.r1.idx--;saveGame();render();}},
   r1Next:function(){if(game.r1.idx<game.r1.items.length-1){game.r1.idx++;sfxWhoosh();saveGame();render();}},
-  r1Reveal:function(){if(scanning)return;scanning=true;sfxWhoosh();render();setTimeout(function(){scanning=false;var it=game.r1.items[game.r1.idx];if(!it){render();return;}it.revealed=true;if(!it.scored){it.scored=true;teams.forEach(function(t){var v=voteFor(it.id,t.id);if(v&&v.value===it.answer)scores[t.id]=(scores[t.id]||0)+1;});saveScores();}saveGame();render();if(it.answer){if(it.answer==="REAL")showFX("🌍","REAL","neutral",sfxReveal);else showFX("🤖","¡ERA IA!","bad",sfxReveal);}},1650);},
+  r1Reveal:function(){if(scanning)return;scanning=true;sfxWhoosh();render();setTimeout(function(){scanning=false;var it=game.r1.items[game.r1.idx];if(!it){render();return;}it.revealed=true;if(!it.scored){it.scored=true;teams.forEach(function(t){var v=voteFor(it.id,t.id);if(v&&v.value===it.answer)scores[t.id]=(scores[t.id]||0)+1;});saveScores();}saveGame();render();if(it.answer){var okc=teams.filter(function(t){var vv=voteFor(it.id,t.id);return vv&&vv.value===it.answer;}).length;if(it.answer==="REAL"){showFX("🌍","REAL","neutral",sfxReveal);narr("¡Esta imagen es real! Acertaron "+okc+" de "+teams.length+" equipos.");}else{showFX("🤖","¡ERA IA!","bad",sfxReveal);narr("¡Cuidado! Esta imagen fue generada por inteligencia artificial. Acertaron "+okc+" de "+teams.length+" equipos.");}}},1650);},
   modalClose:function(){modal=null;render();},
   modalTab:function(el){if(modal)modal.tab=el.dataset.tab;render();},
   itemDel:function(el){var id=el.dataset.id;var it=game.r1.items.find(function(x){return x.id===id;});if(it&&it.mid&&DB)DB.doc("media/"+it.mid).delete().catch(function(){});game.r1.items=game.r1.items.filter(function(x){return x.id!==id;});if(game.r1.idx>=game.r1.items.length)game.r1.idx=Math.max(0,game.r1.items.length-1);saveGame();render();},
 
   // R2/R3 host
   award:function(el,e){addScore(el.dataset.id,parseInt(el.dataset.d,10),e);},
-  revealPrompt:function(){var i=document.getElementById("r2note");if(i){game.r2.note=i.value;saveGame();}scrambleReveal(game.r2.note);},
+  revealPrompt:function(){var i=document.getElementById("r2note");if(i){game.r2.note=i.value;}game.r2.revealed=true;saveGame();scrambleReveal(game.r2.note);render();},
   briefEdit:function(){var cur=game.r3.brief;var nv=prompt("Edita el brief del Reto 3:",cur);if(nv!=null){game.r3.brief=nv;saveGame();render();}},
 
   // timer + fx
@@ -650,14 +815,15 @@ app.addEventListener("click",function(e){var el=e.target.closest("[data-action]"
   }
   if(actions[a])actions[a](el,e);
 });
-app.addEventListener("change",function(e){var f=e.target;if(!(f.dataset&&f.dataset.file))return;var kind=f.dataset.file,file=f.files&&f.files[0];if(!file)return;
+app.addEventListener("change",function(e){var f=e.target;if(f.id==="voiceSel"){voiceURI=f.value;try{localStorage.setItem("torneoIA_voiceURI",voiceURI);}catch(err){}speak("Hola, esta es la voz seleccionada.");return;}if(!(f.dataset&&f.dataset.file))return;var kind=f.dataset.file,file=f.files&&f.files[0];if(!file)return;
   if(kind==="teamphoto")fileToSquare(file,260,0.72,function(d){if(d){draft.photo=d;stopCam();if(forcedRole==="__reg")render_localReg();else render();}else flash("No se pudo leer la imagen");});
   else if(kind==="r3photo")fileToSquare(file,320,0.7,function(d){if(d){draft.photo=d;render();}});
   else if(kind==="r2target")fileToWide(file,760,0.62,function(d){if(!d)return;var mid="m"+uid();media[mid]=d;if(DB)DB.doc("media/"+mid).set({d:d}).catch(handleWErr);game.r2.mid=mid;saveGame();render();});
   else if(kind==="r1item"){var tab=(modal&&modal.tab)||"IA";var pista=(document.getElementById("pistaInput")||{}).value||"";fileToWide(file,760,0.62,function(d){if(!d)return;var mid="m"+uid();media[mid]=d;if(DB)DB.doc("media/"+mid).set({d:d}).catch(handleWErr);game.r1.items.push({id:uid(),mid:mid,answer:tab,pista:pista,revealed:false,scored:false});saveGame();render();});}
   f.value="";
 });
-app.addEventListener("input",function(e){if(e.target.id==="teamName")draft.name=e.target.value;else if(e.target.id==="r2note")game.r2.note=e.target.value;});
+app.addEventListener("input",function(e){if(e.target.id==="teamName")draft.name=e.target.value;else if(e.target.id==="r2note")game.r2.note=e.target.value;else if(e.target.id==="rateSl"){voiceRate=parseFloat(e.target.value)||1;try{localStorage.setItem("torneoIA_voiceRate",voiceRate);}catch(err){}var l=document.getElementById("rateVal");if(l)l.textContent=voiceRate.toFixed(2);}else if(e.target.id==="pitchSl"){voicePitch=parseFloat(e.target.value)||1;try{localStorage.setItem("torneoIA_voicePitch",voicePitch);}catch(err){}var l2=document.getElementById("pitchVal");if(l2)l2.textContent=voicePitch.toFixed(2);}});
+app.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.id==="adminKey"){e.preventDefault();if(actions.adminLogin)actions.adminLogin();}});
 
 /* ---------------- Clock ---------------- */
 function tickClock(){var el=document.getElementById("clock");if(el){var d=new Date();el.textContent=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)+":"+("0"+d.getSeconds()).slice(-2);}}
@@ -681,7 +847,6 @@ async function init(){
   } else { DB=makeLocalDB(); online=false; }
   myId=localStorage.getItem("torneoIA_myid")||("g"+uid());try{localStorage.setItem("torneoIA_myid",myId);}catch(e){}
   var h=(location.hash||"").toLowerCase();
-  var isAdmin=(h.indexOf("admin")>=0||h.indexOf("host")>=0)&&h.indexOf("team")<0;
   role = isAdmin ? "host" : "team";
   CANWRITE=true;
   // subscriptions
