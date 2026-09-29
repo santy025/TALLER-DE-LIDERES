@@ -467,6 +467,7 @@ function sortedTeams(){return teams.slice().sort(function(a,b){return scoreOf(b.
 function avatarHTML(t,cls){cls=cls||"av";var col=t.color||colorFor(t.id);if(t.photo)return '<div class="'+cls+'" style="background:'+col+'"><img src="'+t.photo+'" alt=""></div>';return '<div class="'+cls+'" style="background:'+col+'">'+(t.emoji||emojiFor(t.id))+'</div>';}
 function ansList(kind){var out=[];for(var k in answers){if(answers[k]&&answers[k].kind===kind)out.push(answers[k]);}return out;}
 function voteFor(qid,teamId){return answers["v_"+qid+"_"+teamId];}
+function normA(x){return x==="FAKE"?"IA":x;}
 
 /* ---------------- Writes ---------------- */
 function saveGame(){if(!DB)return;DB.doc("game/state").set(game).catch(handleWErr);}
@@ -690,7 +691,7 @@ function hostR1(){
     }else{
       if(it.answer){mid='<div class="reveal '+(it.answer==="REAL"?"real":"ia")+'">'+(it.answer==="REAL"?"REAL ✔":"IA 🤖")+'</div>';if(it.pista)mid+='<div class="pista">'+esc(it.pista)+'</div>';}
       // per-team result
-      mid+='<div class="score-wrap" style="margin-top:12px"><div class="score-title">RESULTADO DE ESTA IMAGEN</div>'+teams.map(function(t){var vt=voteFor(it.id,t.id);var ok=vt&&vt.value===it.answer;var sub=vt?(vt.value+(ok?" ✔ +1":" ✗ falló")):"sin voto";return '<div class="srow"><div style="color:'+(ok?"var(--green)":"var(--faint)")+';font-size:20px;width:24px;text-align:center">'+(ok?"✔":"·")+'</div>'+avatarHTML(t,"av")+'<div class="snm">'+esc(t.name)+'</div><div class="sub">'+sub+'</div><div class="sc">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
+      mid+='<div class="score-wrap" style="margin-top:12px"><div class="score-title">RESULTADO DE ESTA IMAGEN</div>'+teams.map(function(t){var vt=voteFor(it.id,t.id);var ok=vt&&normA(vt.value)===normA(it.answer);var sub=vt?(normA(vt.value)+(ok?" ✔ +2":" ✗ falló")):"sin voto";return '<div class="srow"><div style="color:'+(ok?"var(--green)":"var(--faint)")+';font-size:20px;width:24px;text-align:center">'+(ok?"✔":"·")+'</div>'+avatarHTML(t,"av")+'<div class="snm">'+esc(t.name)+'</div><div class="sub">'+sub+'</div><div class="sc">'+scoreOf(t.id)+'</div></div>';}).join("")+'</div>';
     }
     var nav='<div class="qnav" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px"><button class="btn btn-ghost btn-sm" data-action="r1Prev"'+(game.r1.idx===0?" disabled":"")+'>◂ Anterior</button><button class="btn btn-cyan btn-sm" data-action="r1Next"'+(game.r1.idx>=items.length-1?" disabled":"")+'>Siguiente imagen ▸</button></div>';
     main='<div class="qwrap"><div class="qimg"><div class="qn">IMAGEN '+(game.r1.idx+1)+' / '+items.length+'</div>'+imgHTML+'</div>'+mid+nav+'</div>';
@@ -752,10 +753,10 @@ function teamR1(){
   var myV=voteFor(it.id,myId);
   var body;
   if(it.revealed){
-    var ok=myV&&myV.value===it.answer;
-    body='<div class="reveal '+(it.answer==="REAL"?"real":"ia")+'">'+(it.answer==="REAL"?"REAL":"ERA IA")+'</div>'+(myV?('<div class="tag '+(ok?"ok":"wait")+'" style="margin-top:8px">'+(ok?"¡Acertaste! +1":"Fallaste esta")+'</div>'):'<div class="tag wait" style="margin-top:8px">No alcanzaste a votar</div>');
+    var ok=myV&&normA(myV.value)===normA(it.answer);
+    body='<div class="reveal '+(it.answer==="REAL"?"real":"ia")+'">'+(it.answer==="REAL"?"REAL":"ERA IA")+'</div>'+(myV?('<div class="tag '+(ok?"ok":"wait")+'" style="margin-top:8px">'+(ok?"¡Correcto! +2 puntos 🎉":"Uy, fallaste 😅")+'</div>'):'<div class="tag wait" style="margin-top:8px">No alcanzaste a votar</div>');
   }else{
-    body='<div class="vote2"><button class="votebtn real'+(myV&&myV.value==="REAL"?" sel":"")+'" data-action="vote" data-q="'+it.id+'" data-v="REAL"><span class="ic">🌍</span>REAL</button><button class="votebtn fake'+(myV&&myV.value==="FAKE"?" sel":"")+'" data-action="vote" data-q="'+it.id+'" data-v="FAKE"><span class="ic">🤖</span>IA</button></div>'+(myV?'<div class="tag ok" style="margin-top:6px">Voto enviado: '+myV.value+' · puedes cambiarlo</div>':'<div class="tag wait" style="margin-top:6px">Elige una opción</div>');
+    body='<div class="vote2"><button class="votebtn real'+(myV&&myV.value==="REAL"?" sel":"")+'" data-action="vote" data-q="'+it.id+'" data-v="REAL"><span class="ic">🌍</span>REAL</button><button class="votebtn fake'+(myV&&normA(myV.value)==="IA"?" sel":"")+'" data-action="vote" data-q="'+it.id+'" data-v="IA"><span class="ic">🤖</span>IA</button></div>'+(myV?'<div class="tag ok" style="margin-top:6px">Voto enviado: '+normA(myV.value)+' · puedes cambiarlo</div>':'<div class="tag wait" style="margin-top:6px">Elige una opción</div>');
   }
   return '<div class="stage"><div class="round-head"><div class="pill hot">RETO 1 · IMAGEN '+(game.r1.idx+1)+'</div><h2>¿Real o IA?</h2></div>'+timerChip()+'<div class="qwrap"><div class="qimg">'+img+'</div>'+'<div class="kbd" style="margin-top:2px">🔍 Toca la imagen para ampliarla</div>'+body+'</div></div>';
 }
@@ -833,7 +834,7 @@ var actions={
   itemToggle:function(el){var id=el.dataset.id;var it=game.r1.items.find(function(x){return x.id===id;});if(it){it.answer=(it.answer==="REAL")?"IA":"REAL";saveGame();render();}},
   r1Prev:function(){if(game.r1.idx>0){game.r1.idx--;saveGame();render();}},
   r1Next:function(){if(game.r1.idx<game.r1.items.length-1){game.r1.idx++;sfxWhoosh();saveGame();render();}},
-  r1Reveal:function(){if(scanning)return;scanning=true;sfxWhoosh();render();setTimeout(function(){scanning=false;var it=game.r1.items[game.r1.idx];if(!it){render();return;}it.revealed=true;if(!it.scored){it.scored=true;teams.forEach(function(t){var v=voteFor(it.id,t.id);if(v&&v.value===it.answer)scores[t.id]=(scores[t.id]||0)+1;});saveScores();}saveGame();render();if(it.answer){var okc=teams.filter(function(t){var vv=voteFor(it.id,t.id);return vv&&vv.value===it.answer;}).length;if(it.answer==="REAL"){showFX("🌍","REAL","neutral",sfxReveal);narr("¡Esta imagen es real! Acertaron "+okc+" de "+teams.length+" equipos.");}else{showFX("🤖","¡ERA IA!","bad",sfxReveal);narr("¡Cuidado! Esta imagen fue generada por inteligencia artificial. Acertaron "+okc+" de "+teams.length+" equipos.");}}},1650);},
+  r1Reveal:function(){if(scanning)return;scanning=true;sfxWhoosh();render();setTimeout(function(){scanning=false;var it=game.r1.items[game.r1.idx];if(!it){render();return;}it.revealed=true;if(!it.scored){it.scored=true;teams.forEach(function(t){var v=voteFor(it.id,t.id);if(v&&normA(v.value)===normA(it.answer))scores[t.id]=(scores[t.id]||0)+2;});saveScores();}saveGame();render();if(it.answer){var okc=teams.filter(function(t){var vv=voteFor(it.id,t.id);return vv&&vv.value===it.answer;}).length;if(it.answer==="REAL"){showFX("🌍","REAL","neutral",sfxReveal);narr("¡Esta imagen es real! Acertaron "+okc+" de "+teams.length+" equipos.");}else{showFX("🤖","¡ERA IA!","bad",sfxReveal);narr("¡Cuidado! Esta imagen fue generada por inteligencia artificial. Acertaron "+okc+" de "+teams.length+" equipos.");}}},1650);},
   modalClose:function(){modal=null;render();},
   modalTab:function(el){if(modal)modal.tab=el.dataset.tab;render();},
   itemDel:function(el){var id=el.dataset.id;var it=game.r1.items.find(function(x){return x.id===id;});if(it&&it.mid&&DB)DB.doc("media/"+it.mid).delete().catch(function(){});game.r1.items=game.r1.items.filter(function(x){return x.id!==id;});if(game.r1.idx>=game.r1.items.length)game.r1.idx=Math.max(0,game.r1.items.length-1);saveGame();render();},
