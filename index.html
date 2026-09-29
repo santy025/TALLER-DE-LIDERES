@@ -730,9 +730,8 @@ function teamRender(){
   if(!CANWRITE){return '<div class="stage"><div class="center"><div class="pill hot">FALTA UN PERMISO</div><h2 class="round-head" style="font-family:var(--disp);font-size:clamp(26px,5vw,44px)">Pídele acceso al anfitrión</h2><p class="hero-sub">Este link está compartido en modo solo lectura. El anfitrión debe compartirlo con permiso de <b>edición</b> (o abrir el acceso a la organización) para que puedas registrar tu equipo.</p></div></div>';}
   if(!myTeam())return teamRegister();
   var mt=myTeam();
-  if(!game.started)return teamWait("¡Bienvenido, "+mt.name+"! 🎉","En unos minutos el administrador dará inicio a la actividad. Mira la pantalla principal. 👀");
   var p=game.phase;
-  if(p==="lobby")return teamWait("¡Listo, "+mt.name+"!","El anfitrión está preparando la siguiente actividad…");
+  if(!p||p==="lobby")return teamWait("¡Bienvenido, "+mt.name+"! 🎉","En unos minutos el administrador dará inicio a la actividad. Mira la pantalla principal. 👀");
   if(p==="r1")return teamR1();
   if(p==="r2")return teamR2();
   if(p==="r3")return teamR3();
